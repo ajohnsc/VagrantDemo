@@ -1,0 +1,35 @@
+Vagrant.configure("2") do |config|
+
+  $script = <<-SCRIPT
+  # create student user
+  sudo useradd -m student
+  # create ssh directory
+  sudo mkdir -vp /home/student/.ssh
+  # copy keys to .ssh directory
+  sudo cp -v /vagrant/keys/* /home/student/.ssh/
+  # make student authorized by the same key
+  sudo cp -v /home/student/.ssh/id_rsa.pub /home/student/.ssh/authorized_keys
+  # Change ownership
+  sudo chown -vR student. /home/student/.ssh/
+  # Change permissions
+  sudo chmod -v 700 /home/student/.ssh/  
+  sudo chmod -v 600 /home/student/.ssh/id_rsa
+  sudo chmod -v 644 /home/student/.ssh/id_rsa.pub
+  sudo chmod -v 700 /home/student/.ssh/authorized_keys
+  # Create sudoers file
+  echo "student ALL=(ALL)	NOPASSWD: ALL" | sudo tee -a /etc/sudoers.d/student
+  SCRIPT
+
+  config.vm.define "testserver" do |test|
+    test.vm.box = "centos/stream8"
+    test.vm.hostname = "test.lab.xyal.cloud"
+    test.vm.provision "shell", inline: $script
+  end
+
+  config.vm.define "servera" do |servera|
+    servera.vm.box = "centos/stream8"
+    servera.vm.hostname = "servera.lab.xyal.cloud"
+    servera.vm.provision "shell", inline: $script
+  end
+
+end

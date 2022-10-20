@@ -1,0 +1,10 @@
+frontend http-in
+    bind *:80
+    default_backend    backend_servers
+    option             forwardfor
+
+backend backend_servers
+    balance            roundrobin
+    {% for host in groups['webservers'] %}
+        server  {{ hostvars[host].ansible_nodename }} {{ hostvars[host].ansible_eth1.ipv4.address }}:80 check
+    {% endfor %}
