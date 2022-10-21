@@ -2,8 +2,11 @@
 192.168.0.110
 
 [webservers]
-192.168.0.111
-192.168.0.112
+192.168.1.111
+192.168.1.112
 
 [databases]
-192.168.0.113
+192.168.1.110
+
+[loadbalancers:vars]
+ansible_ssh_common_args='-o ProxyCommand="ssh -W %h:%p -q student@192.168.1.111"'
